@@ -1,0 +1,20 @@
+#Importando dados do BAcen
+
+import pandas as pd
+import matplotlib_inline
+
+#puxando dados do banco central
+def consulta_bc(codigo_bcb):
+    url3 = 'http://api.bcb.gov.br/dados/serie/bcdata.sgs.{}/dados?formato=json'.format(codigo_bcb)
+    df_consulta = pd.read_json(url3) 
+    df_consulta.rename(columns={'data': 'DATA_COTA'}, inplace=True)
+    df_consulta['DATA_COTA'] = pd.to_datetime(df_consulta['DATA_COTA'], dayfirst=True)
+    df_consulta.set_index('DATA_COTA', inplace=True)
+    df_consulta.reset_index(inplace=True)
+    df_consulta['DATA_COTA']= df_consulta['DATA_COTA'].dt.strftime('%m/%d/%Y')
+
+    return df_consulta
+
+ipca = consulta_bc(4390) #12 é o código para o CDI no site do BC
+ipca.to_excel('dados_SELIC.xlsx', index=False)
+ipca
